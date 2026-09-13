@@ -6,15 +6,24 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "studio:dev": "cd studio && npm run dev",
+    "studio:build": "cd studio && npm run build",
+    "studio:deploy": "cd studio && npm run deploy",
+    "studio:install": "cd studio && npm install"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.9.2",
+    "@sanity/image-url": "^2.1.1",
+    "@sanity/vision": "^5.31.2",
     "clsx": "^2.1.1",
     "lucide-react": "^1.45.0",
     "next": "16.3.5",
+    "next-sanity": "^13.3.4",
     "react": "19.2.8",
     "react-dom": "19.2.8",
+    "sanity": "^5.31.2",
+    "styled-components": "^6.5.3",
     "tailwind-merge": "^3.7.0"
   },
   "devDependencies": {

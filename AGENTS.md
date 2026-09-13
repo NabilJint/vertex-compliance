@@ -125,6 +125,9 @@ Run these from the correct workspace and report the real output. Never claim a c
 •	In Studio: deploy the Studio application, which is required before the Context MCP will serve the dataset, deploy the schema, and import content and config documents.
 After you implement, run the type check and lint at minimum, add a build when routes, config, or server modules changed, and for search or ingestion work verify against the live MCP endpoint.
  
-14. When in doubt
+14. Dev server
+Never kill or stop a running `npm run dev` process. If you need to restart the server (e.g. after env changes), use a new port or ask the user to stop it manually. Killing the dev server disrupts the user's workflow.
+
+15. When in doubt
 Keep it small. Use the relevant skill. Preserve the server and client boundaries and the private token rule. Match the provided UI exactly. Get specifics from setup and config instead of hardcoding them. Save a prompt and get approval before coding. Run the checks. Share exact test steps.
 

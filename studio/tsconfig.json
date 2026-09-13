@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "sanity/*": ["./node_modules/sanity/*"]
+    }
+  },
+  "include": ["./**/*.ts", "./**/*.tsx"]
+}

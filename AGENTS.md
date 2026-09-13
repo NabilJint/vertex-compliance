@@ -28,6 +28,8 @@ Do not write code before the prompt is approved, unless the user tells you to sk
  
 3. UI work
 You do not design UI. The user gives you the design as desktop images plus a prompt. Reproduce them exactly: layout, spacing, typography, color, and states. There is no mobile reference, so make each page responsive down to mobile, adapting the layout sensibly (stack columns, collapse the lesson sidebar) while keeping the desktop exact. Do not restyle or improve beyond the reference. Reuse the components and Tailwind patterns already in the project before you add new ones. When there is a reference image, it is the source of truth, and this file says nothing about visuals on purpose.
+Never use native HTML elements when a project component exists. The `components/ui/` directory has Button, Input, Card, Badge, Avatar, Progress, Tabs, Dialog, and Toast. Always use these instead of `<button>`, `<input>`, `<div>` for cards, `<span>` for badges, or any other raw element. If a needed component does not exist, build it in `components/ui/` first.
+Prioritize reusability across all code. Before writing new utilities, hooks, helpers, or components, search for existing ones in `lib/`, `components/ui/`, and `hooks/`. Never duplicate logic — extract shared patterns into reusable modules. If a utility or hook is needed in multiple places, promote it to a shared location on first use.
  
 4. Skills to lean on
 Reach for these instead of guessing. Do not invent new ones.

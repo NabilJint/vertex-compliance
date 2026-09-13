@@ -1,7 +1,9 @@
+"use client"
+
 import Link from "next/link"
 import Image from "next/image"
-import { Search, Bell, ChevronDown } from "lucide-react"
-import { Avatar } from "@/components/ui/avatar"
+import { Search, Bell } from "lucide-react"
+import { SignInButton, SignUpButton, UserButton, useAuth } from "@clerk/nextjs"
 import { Button } from "@/components/ui/button"
 
 const navLinks = [
@@ -12,6 +14,8 @@ const navLinks = [
 ]
 
 export function Header() {
+  const { isSignedIn } = useAuth()
+
   return (
     <header className="sticky top-0 z-50 border-b bg-white" style={{ borderColor: "#E5E7EB" }}>
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
@@ -36,17 +40,24 @@ export function Header() {
           <Button variant="ghost" size="sm">
             <Search className="h-5 w-5" />
           </Button>
-          <Button variant="ghost" size="sm" className="relative">
-            <Bell className="h-5 w-5" />
-            <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full" style={{ backgroundColor: "#EF4444" }} />
-          </Button>
-          <div className="flex items-center gap-2 ml-2">
-            <Avatar fallback="JY" size="sm" />
-            <span className="hidden text-[14px] font-medium md:block" style={{ color: "#111827" }}>
-              Jintoro Yusuf
-            </span>
-            <ChevronDown className="hidden h-4 w-4 md:block" style={{ color: "#94A3B8" }} />
-          </div>
+          {isSignedIn ? (
+            <>
+              <Button variant="ghost" size="sm" className="relative">
+                <Bell className="h-5 w-5" />
+                <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full" style={{ backgroundColor: "#EF4444" }} />
+              </Button>
+              <UserButton />
+            </>
+          ) : (
+            <>
+              <SignInButton mode="modal">
+                <Button variant="ghost" size="sm">Sign In</Button>
+              </SignInButton>
+              <SignUpButton mode="modal">
+                <Button size="sm">Sign Up</Button>
+              </SignUpButton>
+            </>
+          )}
         </div>
       </div>
     </header>

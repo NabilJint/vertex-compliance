@@ -1,7 +1,10 @@
+"use client"
+
 import Link from "next/link"
 import Image from "next/image"
 import { Clock, BookOpen } from "lucide-react"
 import { Card } from "@/components/ui/card"
+import { capturePostHogEvent } from "@/lib/posthog-client"
 import { Badge } from "@/components/ui/badge"
 import { Avatar } from "@/components/ui/avatar"
 import { urlFor } from "@/sanity/lib/image"
@@ -21,7 +24,16 @@ export function ProgramCard({ program }: ProgramCardProps) {
   const categoryColor = getCategoryColor(program.category.slug?.current)
 
   return (
-    <Link href={`/catalog/${program.slug.current}`}>
+    <Link
+      href={`/catalog/${program.slug.current}`}
+      onClick={() => capturePostHogEvent("training_program_selected", {
+        program_id: program._id,
+        program_slug: program.slug.current,
+        category: program.category.slug?.current,
+        lesson_count: lessonCount,
+        total_duration_seconds: totalSeconds,
+      })}
+    >
       <Card className="group h-full overflow-hidden transition-shadow hover:shadow-lg">
         <div className="relative h-40 overflow-hidden bg-gray-100">
           {coverUrl && (

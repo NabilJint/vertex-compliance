@@ -1,7 +1,10 @@
+"use client"
+
 import Link from "next/link"
 import Image from "next/image"
 import { Play, Clock, BookOpen, ShieldCheck, Star, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { capturePostHogEvent } from "@/lib/posthog-client"
 import { Badge } from "@/components/ui/badge"
 import { Avatar } from "@/components/ui/avatar"
 import { urlFor } from "@/sanity/lib/image"
@@ -92,11 +95,26 @@ export function TrainingHero({ program, totalDurationSeconds, totalLessons, prev
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-              <Link href={startLessonHref}>
+              <Link
+                href={startLessonHref}
+                onClick={() => capturePostHogEvent("training_started", {
+                  program_id: program._id,
+                  program_slug: program.slug.current,
+                  entry_point: "primary_cta",
+                  total_lessons: totalLessons,
+                })}
+              >
                 <Button size="lg">Start training</Button>
               </Link>
               {previewLesson && (
-                <Link href={`/lessons/${previewLesson.slug.current}`}>
+                <Link
+                  href={`/lessons/${previewLesson.slug.current}`}
+                  onClick={() => capturePostHogEvent("training_previewed", {
+                    program_id: program._id,
+                    program_slug: program.slug.current,
+                    lesson_id: previewLesson._id,
+                  })}
+                >
                   <Button variant="secondary" size="lg" className="gap-2">
                     <Play className="h-4 w-4" /> Preview first lesson
                   </Button>
@@ -116,6 +134,12 @@ export function TrainingHero({ program, totalDurationSeconds, totalLessons, prev
             <div className="absolute inset-0 bg-black/20" />
             <Link
               href={startLessonHref}
+              onClick={() => capturePostHogEvent("training_started", {
+                program_id: program._id,
+                program_slug: program.slug.current,
+                entry_point: "cover_play_button",
+                total_lessons: totalLessons,
+              })}
               className="absolute left-1/2 top-1/2 flex h-16 w-16 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 shadow-lg transition-transform hover:scale-105"
             >
               <Play className="ml-1 h-6 w-6" style={{ color: "#1E1B4B" }} fill="#1E1B4B" />

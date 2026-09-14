@@ -5,6 +5,7 @@ import Image from "next/image"
 import { Search, Bell } from "lucide-react"
 import { SignInButton, SignUpButton, UserButton, useAuth } from "@clerk/nextjs"
 import { Button } from "@/components/ui/button"
+import { capturePostHogEvent } from "@/lib/posthog-client"
 
 const navLinks = [
   { label: "Catalog", href: "/catalog" },
@@ -51,10 +52,21 @@ export function Header() {
           ) : (
             <>
               <SignInButton mode="modal">
-                <Button variant="ghost" size="sm">Sign In</Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => capturePostHogEvent("auth_cta_clicked", { action: "sign_in", location: "header" })}
+                >
+                  Sign In
+                </Button>
               </SignInButton>
               <SignUpButton mode="modal">
-                <Button size="sm">Sign Up</Button>
+                <Button
+                  size="sm"
+                  onClick={() => capturePostHogEvent("auth_cta_clicked", { action: "sign_up", location: "header" })}
+                >
+                  Sign Up
+                </Button>
               </SignUpButton>
             </>
           )}

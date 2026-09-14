@@ -4,6 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { ChevronDown, ChevronUp, Play, CheckCircle2, Circle, Video, FileCheck, Award, Smartphone, RefreshCw } from "lucide-react"
 import { Card } from "@/components/ui/card"
+import { capturePostHogEvent } from "@/lib/posthog-client"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
@@ -99,6 +100,13 @@ function ModuleAccordion({
             <Link
               key={lesson.id}
               href={lesson.resumeSeconds ? `/lessons/${lesson.slug}?t=${lesson.resumeSeconds}` : `/lessons/${lesson.slug}`}
+              onClick={() => capturePostHogEvent("lesson_selected", {
+                lesson_id: lesson.id,
+                lesson_slug: lesson.slug,
+                module_key: module.key,
+                lesson_status: lesson.status,
+                is_free_preview: lesson.isFreePreview,
+              })}
               className="flex items-center justify-between gap-3 px-5 py-3.5 transition-colors hover:bg-gray-50"
               style={{ borderTop: index === 0 ? undefined : "1px solid #F8FAFC" }}
             >
@@ -134,6 +142,10 @@ export function Curriculum({ modules, totalLessons, totalDurationSeconds, comple
   const allOpen = modules.length > 0 && modules.every((module) => openKeys.has(module.key))
 
   function toggleModule(key: string) {
+    capturePostHogEvent("curriculum_module_toggled", {
+      module_key: key,
+      action: openKeys.has(key) ? "collapsed" : "expanded",
+    })
     setOpenKeys((prev) => {
       const next = new Set(prev)
       if (next.has(key)) next.delete(key)
@@ -143,6 +155,10 @@ export function Curriculum({ modules, totalLessons, totalDurationSeconds, comple
   }
 
   function toggleAll() {
+    capturePostHogEvent("curriculum_module_toggled", {
+      module_key: "all",
+      action: allOpen ? "collapsed" : "expanded",
+    })
     setOpenKeys(allOpen ? new Set() : new Set(modules.map((module) => module.key)))
   }
 

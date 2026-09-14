@@ -1,6 +1,9 @@
+"use client"
+
 import Link from "next/link"
 import { Shield, Lock, Users, DollarSign, Heart, FileText, ChevronRight, ArrowRight } from "lucide-react"
 import { Card } from "@/components/ui/card"
+import { capturePostHogEvent } from "@/lib/posthog-client"
 
 const categories = [
   { name: "Security", count: "2,480 videos", icon: Shield },
@@ -26,6 +29,10 @@ export function BrowseCategory() {
             <Link
               key={c.name}
               href={`/catalog?category=${c.name.toLowerCase()}`}
+              onClick={() => capturePostHogEvent("category_selected", {
+                category: c.name.toLowerCase(),
+                location: "homepage",
+              })}
             >
               <Card className="group flex items-center justify-between p-5 transition-all hover:shadow-md">
                 <div className="flex items-center gap-4">

@@ -1,6 +1,9 @@
+"use client"
+
 import Link from "next/link"
 import { CheckCircle, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { capturePostHogEvent } from "@/lib/posthog-client"
 import { Badge } from "@/components/ui/badge"
 import { Card } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
@@ -38,7 +41,10 @@ export function ComplianceCallout() {
                 </li>
               ))}
             </ul>
-            <Link href="/dashboard">
+            <Link
+              href="/dashboard"
+              onClick={() => capturePostHogEvent("dashboard_explored", { location: "homepage_callout" })}
+            >
               <Button size="lg">
                 Explore the dashboard <ArrowRight className="h-4 w-4" />
               </Button>

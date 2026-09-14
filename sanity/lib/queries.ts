@@ -7,37 +7,26 @@ export const ALL_TRAINING_PROGRAMS_QUERY = defineQuery(`
     _id,
     title,
     slug,
-    summary,
     coverImage,
     level,
-    requiredBy,
-    isPopular,
-    employeeCount,
-    learningOutcomes[] {
-      _key,
-      icon,
-      title,
-      description
-    },
     trainer-> {
       _id,
       name,
-      slug,
-      photo,
-      expertise
+      photo
     },
     category-> {
       _id,
       title,
       slug
     },
-    count(modules[].lessons[]) as lessonCount
+    "lessonDurations": modules[].lessons[]->duration
   }
 `)
 
 export const TRAINING_PROGRAM_BY_SLUG_QUERY = defineQuery(`
   *[_type == "trainingProgram" && slug.current == $slug][0] {
     _id,
+    _updatedAt,
     title,
     slug,
     summary,
@@ -80,6 +69,90 @@ export const TRAINING_PROGRAM_BY_SLUG_QUERY = defineQuery(`
         employeeCount
       }
     }
+  }
+`)
+
+export const FEATURED_TRAINING_PROGRAMS_QUERY = defineQuery(`
+  *[_type == "trainingProgram" && isPopular == true] | order(requiredBy asc) [0...4] {
+    _id,
+    title,
+    slug,
+    coverImage,
+    level,
+    trainer-> {
+      _id,
+      name,
+      photo
+    },
+    category-> {
+      _id,
+      title,
+      slug
+    },
+    "lessonDurations": modules[].lessons[]->duration
+  }
+`)
+
+export const OTHER_FEATURED_TRAINING_PROGRAMS_QUERY = defineQuery(`
+  *[_type == "trainingProgram" && isPopular != true] | order(requiredBy asc) [0...4] {
+    _id,
+    title,
+    slug,
+    coverImage,
+    level,
+    trainer-> {
+      _id,
+      name,
+      photo
+    },
+    category-> {
+      _id,
+      title,
+      slug
+    },
+    "lessonDurations": modules[].lessons[]->duration
+  }
+`)
+
+export const RELATED_TRAINING_PROGRAMS_QUERY = defineQuery(`
+  *[_type == "trainingProgram" && _id != $excludeId && category._ref == $categoryId] | order(title asc) [0...3] {
+    _id,
+    title,
+    slug,
+    coverImage,
+    level,
+    trainer-> {
+      _id,
+      name,
+      photo
+    },
+    category-> {
+      _id,
+      title,
+      slug
+    },
+    "lessonDurations": modules[].lessons[]->duration
+  }
+`)
+
+export const OTHER_TRAINING_PROGRAMS_QUERY = defineQuery(`
+  *[_type == "trainingProgram" && _id != $excludeId] | order(title asc) [0...3] {
+    _id,
+    title,
+    slug,
+    coverImage,
+    level,
+    trainer-> {
+      _id,
+      name,
+      photo
+    },
+    category-> {
+      _id,
+      title,
+      slug
+    },
+    "lessonDurations": modules[].lessons[]->duration
   }
 `)
 

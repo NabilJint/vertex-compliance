@@ -83,7 +83,7 @@ async function fetchImage(url: string): Promise<Buffer | null> {
     const resp = await fetch(url, { signal: AbortSignal.timeout(30000) });
     if (!resp.ok) { console.log(`[HTTP ${resp.status}]`); return null; }
     return Buffer.from(await resp.arrayBuffer());
-  } catch (e: any) { console.log(`[${e.message?.substring(0, 60)}]`); return null; }
+  } catch (e: unknown) { console.log(`[${e instanceof Error ? e.message?.substring(0, 60) : 'unknown error'}]`); return null; }
 }
 
 async function main() {
@@ -112,7 +112,7 @@ async function main() {
         await client.patch(docId).set({ [field]: { _type: 'image', asset: { _type: 'reference', _ref: asset._id } } }).commit();
         console.log('OK'); ok++;
         await sleep(150);
-      } catch (err: any) { console.log(`FAIL (${err.message?.substring(0, 70)})`); fail++; }
+      } catch (err: unknown) { console.log(`FAIL (${err instanceof Error ? err.message?.substring(0, 70) : 'unknown error'})`); fail++; }
     }
   }
   console.log(`\nDone: ${ok} uploaded, ${fail} failed`);

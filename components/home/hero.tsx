@@ -1,6 +1,8 @@
 "use client"
 
 import type { FormEvent } from "react"
+import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { capturePostHogEvent } from "@/lib/posthog-client"
@@ -10,9 +12,20 @@ import { Badge } from "@/components/ui/badge"
 const suggestions = ["Data handling rules", "Incident reporting", "Annual security training"]
 
 export function Hero() {
+  const router = useRouter()
+  const [query, setQuery] = useState("")
+
   function handleSearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    capturePostHogEvent("search_submitted", { location: "homepage_hero" })
+    capturePostHogEvent("search_submitted", { location: "homepage_hero", query })
+    if (query.trim()) {
+      router.push(`/search?q=${encodeURIComponent(query.trim())}`)
+    }
+  }
+
+  function handleSuggestionClick(suggestion: string) {
+    capturePostHogEvent("search_submitted", { location: "homepage_hero_suggestion", query: suggestion })
+    router.push(`/search?q=${encodeURIComponent(suggestion)}`)
   }
 
   return (
@@ -50,6 +63,8 @@ export function Hero() {
           <div className="flex-1">
             <Input
               type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
               placeholder='Ask anything — e.g. "How do I report a data breach?"'
               className="border-0 bg-transparent text-[16px] leading-[24px] shadow-none focus:ring-0 focus:ring-offset-0"
             />
@@ -61,7 +76,12 @@ export function Hero() {
         </form>
         <div className="flex flex-wrap items-center justify-center gap-2">
           {suggestions.map((s) => (
-            <Badge key={s} variant="default" className="cursor-pointer border-[#E5E7EB] bg-white text-[#475569] hover:bg-gray-50">
+            <Badge
+              key={s}
+              variant="default"
+              className="cursor-pointer border-[#E5E7EB] bg-white text-[#475569] hover:bg-gray-50"
+              onClick={() => handleSuggestionClick(s)}
+            >
               {s}
             </Badge>
           ))}

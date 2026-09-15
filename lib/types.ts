@@ -103,3 +103,48 @@ export interface UserProgress {
 }
 
 export type LessonStatus = "completed" | "in-progress" | "not-started"
+
+export interface VideoChapter {
+  _key: string
+  startSeconds: number
+  label: string
+}
+
+export interface VideoChunk {
+  _key: string
+  startSeconds: number
+  text: string
+}
+
+export interface VideoDoc {
+  _id: string
+  videoId: string
+  videoUrl: string
+  chapters: VideoChapter[]
+  chunks: VideoChunk[]
+}
+
+export interface LessonPageLesson {
+  _id: string
+  title: string
+  slug: SanitySlug
+  videoUrl?: string
+  posterImage?: SanityImageRef
+  duration?: number
+  isFreePreview?: boolean
+  employeeCount?: number
+  notes?: PortableTextBlock[]
+  keyPoints?: string[]
+  proTip?: string
+  resources?: LessonResource[]
+  program?: LessonPageProgram | null
+}
+
+export interface LessonPageProgram {
+  _id: string
+  title: string
+  slug: SanitySlug
+  requiredBy?: string
+  category: CategorySummary
+  modules: TrainingModule[]
+}

@@ -248,6 +248,57 @@ export const VIDEO_BY_URL_QUERY = defineQuery(`
   }
 `)
 
+// --- Lesson Page (lesson + reverse-referenced program) ---
+
+export const LESSON_PAGE_QUERY = defineQuery(`
+  *[_type == "lesson" && slug.current == $slug][0] {
+    _id,
+    title,
+    slug,
+    videoUrl,
+    posterImage,
+    duration,
+    isFreePreview,
+    employeeCount,
+    notes,
+    keyPoints,
+    proTip,
+    resources[] {
+      _key,
+      type,
+      title,
+      description,
+      url
+    },
+    "program": *[_type == "trainingProgram" && references(^._id)][0] {
+      _id,
+      title,
+      slug,
+      requiredBy,
+      category-> {
+        _id,
+        title,
+        slug
+      },
+      modules[] {
+        _key,
+        title,
+        summary,
+        lessons[]-> {
+          _id,
+          title,
+          slug,
+          videoUrl,
+          posterImage,
+          duration,
+          isFreePreview,
+          employeeCount
+        }
+      }
+    }
+  }
+`)
+
 // --- Agent Context ---
 
 export const AGENT_CONTEXT_QUERY = defineQuery(`

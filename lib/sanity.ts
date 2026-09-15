@@ -1,5 +1,5 @@
-import { readClient } from '../sanity/lib/client'
-import type { FeaturedTrainingProgram, RelatedTrainingProgram, TrainingProgram, UserProgress } from '../lib/types'
+import { readClient, writeClient } from '../sanity/lib/client'
+import type { FeaturedTrainingProgram, LessonPageLesson, RelatedTrainingProgram, TrainingProgram, UserProgress, VideoDoc } from '../lib/types'
 import {
   ALL_TRAINING_PROGRAMS_QUERY,
   TRAINING_PROGRAM_BY_SLUG_QUERY,
@@ -9,6 +9,7 @@ import {
   OTHER_TRAINING_PROGRAMS_QUERY,
   ALL_LESSONS_QUERY,
   LESSON_BY_SLUG_QUERY,
+  LESSON_PAGE_QUERY,
   ALL_TRAINERS_QUERY,
   TRAINER_BY_SLUG_QUERY,
   ALL_CATEGORIES_QUERY,
@@ -90,4 +91,60 @@ export async function getVideoByUrl(videoUrl: string) {
 
 export async function getProgressByUser(userId: string): Promise<UserProgress | null> {
   return readClient.fetch(PROGRESS_BY_USER_QUERY, { userId })
+}
+
+// --- Lesson Page ---
+
+export async function getLessonPageBySlug(slug: string): Promise<LessonPageLesson | null> {
+  return readClient.fetch(LESSON_PAGE_QUERY, { slug })
+}
+
+export async function getVideoDocByUrl(videoUrl: string): Promise<VideoDoc | null> {
+  return readClient.fetch(VIDEO_BY_URL_QUERY, { videoUrl })
+}
+
+export async function saveProgress(
+  userId: string,
+  patch: { lessonId?: string; positionSeconds?: number; completed?: boolean }
+): Promise<void> {
+  const existing = await readClient.fetch<{ _id: string } | null>(
+    `*[_type == "progress" && userId == $userId][0]{ _id }`,
+    { userId }
+  )
+
+  if (!existing) {
+    await writeClient.createIfNotExists({
+      _type: "progress",
+      _id: `progress-${userId}`,
+      userId,
+      completedLessons: patch.completed && patch.lessonId
+        ? [{ _type: "reference", _ref: patch.lessonId }]
+        : [],
+      lastPosition: patch.lessonId
+        ? {
+            _type: "lastPosition",
+            lesson: { _type: "reference", _ref: patch.lessonId },
+            positionSeconds: patch.positionSeconds ?? 0,
+          }
+        : undefined,
+    })
+  } else {
+    const p = writeClient.patch(existing._id).setIfMissing({ completedLessons: [] })
+
+    if (patch.completed && patch.lessonId) {
+      p.append("completedLessons", [{ _type: "reference", _ref: patch.lessonId }])
+    }
+
+    if (patch.lessonId && patch.positionSeconds !== undefined) {
+      p.set({
+        lastPosition: {
+          _type: "lastPosition",
+          lesson: { _type: "reference", _ref: patch.lessonId },
+          positionSeconds: patch.positionSeconds,
+        },
+      })
+    }
+
+    await p.commit()
+  }
 }

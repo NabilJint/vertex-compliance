@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
+import { useRouter } from "next/navigation"
 import { Search, Bell } from "lucide-react"
 import { SignInButton, SignUpButton, UserButton, useAuth } from "@clerk/nextjs"
 import { Button } from "@/components/ui/button"
@@ -16,6 +17,7 @@ const navLinks = [
 
 export function Header() {
   const { isSignedIn } = useAuth()
+  const router = useRouter()
 
   return (
     <header className="sticky top-0 z-50 border-b bg-white" style={{ borderColor: "#E5E7EB" }}>
@@ -38,7 +40,7 @@ export function Header() {
           </nav>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm">
+          <Button variant="ghost" size="sm" onClick={() => router.push("/search")}>
             <Search className="h-5 w-5" />
           </Button>
           {isSignedIn ? (

@@ -18,14 +18,21 @@ function useTabs() {
 
 interface TabsProps {
   defaultValue: string
+  onValueChange?: (value: string) => void
   children: ReactNode
   className?: string
 }
 
-function Tabs({ defaultValue, children, className }: TabsProps) {
+function Tabs({ defaultValue, onValueChange, children, className }: TabsProps) {
   const [activeTab, setActiveTab] = useState(defaultValue)
+
+  function handleChange(value: string) {
+    setActiveTab(value)
+    onValueChange?.(value)
+  }
+
   return (
-    <TabsContext.Provider value={{ activeTab, setActiveTab }}>
+    <TabsContext.Provider value={{ activeTab, setActiveTab: handleChange }}>
       <div className={cn("w-full", className)}>{children}</div>
     </TabsContext.Provider>
   )

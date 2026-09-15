@@ -19,7 +19,7 @@ if (!projectToken) {
   posthog.init(projectToken, {
     api_host: posthogHost,
     defaults: "2026-01-30",
-    capture_exceptions: true,
+    capture_exceptions: process.env.NODE_ENV === "production",
     debug: process.env.NODE_ENV === "development",
   })
 }

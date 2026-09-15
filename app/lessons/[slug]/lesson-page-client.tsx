@@ -15,6 +15,7 @@ interface LessonPageClientProps {
   employeeCount?: number
   requiredBy?: string
   isCompleted: boolean
+  resumeSeconds?: number
   keyPoints?: string[]
   notes?: PortableTextBlock[]
   proTip?: string
@@ -31,6 +32,7 @@ export function LessonPageClient({
   employeeCount,
   requiredBy,
   isCompleted: initialCompleted,
+  resumeSeconds,
   keyPoints,
   notes,
   proTip,
@@ -42,6 +44,15 @@ export function LessonPageClient({
   useEffect(() => {
     capturePostHogEvent("lesson_viewed", { lesson_id: lessonId })
   }, [lessonId])
+
+  useEffect(() => {
+    if (resumeSeconds && resumeSeconds > 0) {
+      capturePostHogEvent("resume_used", {
+        lesson_id: lessonId,
+        resume_seconds: Math.round(resumeSeconds),
+      })
+    }
+  }, [lessonId, resumeSeconds])
 
   const handleComplete = useCallback(async () => {
     setIsCompleted(true)

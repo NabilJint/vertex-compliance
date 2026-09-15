@@ -6,6 +6,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Card } from "@/components/ui/card"
 import { PortableText } from "@portabletext/react"
 import { formatTimestamp } from "@/lib/utils"
+import { capturePostHogEvent } from "@/lib/posthog-client"
 import type { PortableTextBlock, LessonResource, VideoChunk } from "@/lib/types"
 
 interface LessonTabsProps {
@@ -20,8 +21,12 @@ interface LessonTabsProps {
 export function LessonTabs({ keyPoints, notes, proTip, resources, chunks, onSeekTo }: LessonTabsProps) {
   const [localNotes, setLocalNotes] = useState("")
 
+  function handleTabChange(value: string) {
+    capturePostHogEvent("lesson_tab_changed", { tab_name: value })
+  }
+
   return (
-    <Tabs defaultValue="overview">
+    <Tabs defaultValue="overview" onValueChange={handleTabChange}>
       <TabsList>
         <TabsTrigger value="overview">Overview</TabsTrigger>
         <TabsTrigger value="notes">Notes</TabsTrigger>
@@ -125,6 +130,12 @@ export function LessonTabs({ keyPoints, notes, proTip, resources, chunks, onSeek
                       href={resource.url}
                       target="_blank"
                       rel="noopener noreferrer"
+                      onClick={() =>
+                        capturePostHogEvent("resource_link_clicked", {
+                          resource_title: resource.title,
+                          resource_type: resource.type ?? "unknown",
+                        })
+                      }
                       className="mt-2 inline-flex items-center gap-1 text-[13px] font-medium transition-colors hover:underline"
                       style={{ color: "#3B82F6" }}
                     >

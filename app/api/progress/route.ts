@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@clerk/nextjs/server"
 import { saveProgress } from "@/lib/sanity"
+import { captureServerEvent, flushServerEvents } from "@/lib/posthog-server"
 
 export async function POST(request: NextRequest) {
   const { userId } = await auth()
@@ -33,6 +34,18 @@ export async function POST(request: NextRequest) {
 
   try {
     await saveProgress(userId, { lessonId, positionSeconds, completed })
+
+    captureServerEvent({
+      event: "progress_saved",
+      distinctId: userId,
+      properties: {
+        lesson_id: lessonId ?? null,
+        completed: completed ?? null,
+        position_seconds: positionSeconds ?? null,
+      },
+    })
+    await flushServerEvents()
+
     return NextResponse.json({ ok: true })
   } catch (error) {
     console.error("Failed to save progress:", error)

@@ -6,6 +6,7 @@ import { Play, Pause } from "lucide-react"
 import { urlFor } from "@/sanity/lib/image"
 import { getYouTubeEmbedUrl } from "@/lib/youtube"
 import { formatTimestamp } from "@/lib/utils"
+import { capturePostHogEvent } from "@/lib/posthog-client"
 import { Badge } from "@/components/ui/badge"
 
 interface VideoPlayerProps {
@@ -15,6 +16,7 @@ interface VideoPlayerProps {
   duration?: number
   moduleLessonLabel: string
   positionInSeconds?: number
+  lessonId?: string
   onTimeUpdate?: (seconds: number) => void
   onFirstPlay?: () => void
 }
@@ -26,6 +28,7 @@ export function VideoPlayer({
   duration,
   moduleLessonLabel,
   positionInSeconds,
+  lessonId,
   onTimeUpdate,
   onFirstPlay,
 }: VideoPlayerProps) {
@@ -33,6 +36,7 @@ export function VideoPlayer({
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [hasPlayed, setHasPlayed] = useState(false)
+  const lastWatchDepthRef = useRef(0)
   const posterUrl = posterImage ? urlFor(posterImage).width(960).height(540).url() : undefined
   const embedUrl = getYouTubeEmbedUrl(videoUrl, positionInSeconds)
 
@@ -42,11 +46,22 @@ export function VideoPlayer({
       const data = JSON.parse(
         iframeRef.current.getAttribute("data-last-state") || '{"state":0,"time":0}'
       )
-      onTimeUpdate?.(data.time ?? 0)
+      const currentTime = data.time ?? 0
+      onTimeUpdate?.(currentTime)
+
+      if (lessonId && duration && currentTime - lastWatchDepthRef.current >= 30) {
+        lastWatchDepthRef.current = currentTime
+        capturePostHogEvent("video_watch_depth", {
+          lesson_id: lessonId,
+          current_seconds: Math.round(currentTime),
+          duration,
+          percent_watched: Math.round((currentTime / duration) * 100),
+        })
+      }
     } catch {
       // ignore parse errors
     }
-  }, [onTimeUpdate])
+  }, [onTimeUpdate, lessonId, duration])
 
   useEffect(() => {
     if (!embedUrl) return
@@ -66,6 +81,24 @@ export function VideoPlayer({
             if (!hasPlayed) {
               setHasPlayed(true)
               onFirstPlay?.()
+              const currentTime = (() => {
+                try {
+                  const d = JSON.parse(
+                    iframeRef.current?.getAttribute("data-last-state") || '{"time":0}'
+                  )
+                  return d.time ?? 0
+                } catch {
+                  return 0
+                }
+              })()
+              if (lessonId) {
+                capturePostHogEvent("video_played", {
+                  lesson_id: lessonId,
+                  video_url: videoUrl,
+                  position_seconds: Math.round(currentTime),
+                  duration: duration ?? 0,
+                })
+              }
             }
             interval = setInterval(handleTimeUpdate, 10000)
           } else {

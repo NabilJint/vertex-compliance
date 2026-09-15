@@ -1,6 +1,7 @@
 import { Header } from "@/components/home/header"
 import { Footer } from "@/components/home/footer"
 import { ProgramCard } from "@/components/training/program-card"
+import { PageTracker } from "@/components/analytics/page-tracker"
 import { getAllTrainingPrograms } from "@/lib/sanity"
 
 export default async function CatalogPage() {
@@ -9,6 +10,7 @@ export default async function CatalogPage() {
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
+      <PageTracker event="catalog_viewed" properties={{ program_count: programs.length }} />
       <main className="flex-1">
         <section className="py-12">
           <div className="mx-auto max-w-7xl px-6">

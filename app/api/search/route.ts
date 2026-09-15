@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
+import { auth } from "@clerk/nextjs/server"
 import { SEARCH_SYSTEM_PROMPT } from "@/lib/search-prompts"
+import { captureServerEvent, flushServerEvents } from "@/lib/posthog-server"
 import type { SearchResponse, SearchResult } from "@/lib/search-types"
 
 const PROJECT_ID = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
@@ -231,6 +233,7 @@ function parseSearchResponse(text: string, query: string): SearchResponse {
 }
 
 export async function POST(request: NextRequest) {
+  const startTime = Date.now()
   let body: unknown
   try {
     body = await request.json()
@@ -301,6 +304,20 @@ Rules:
 
     const llmResponse = await callLLM(systemPrompt, llmPrompt)
     const searchResponse = parseSearchResponse(llmResponse, query.trim())
+
+    const latencyMs = Date.now() - startTime
+    const { userId } = await auth()
+    captureServerEvent({
+      event: "search_api_performed",
+      distinctId: userId ?? "anonymous",
+      properties: {
+        query: query.trim(),
+        result_count: searchResponse.totalCount,
+        has_llm_results: searchResponse.results.length > 0,
+        latency_ms: latencyMs,
+      },
+    })
+    await flushServerEvents()
 
     return NextResponse.json(searchResponse)
   } catch (error) {

@@ -10,7 +10,9 @@
     "studio:dev": "cd studio && npm run dev",
     "studio:build": "cd studio && npm run build",
     "studio:deploy": "cd studio && npm run deploy",
-    "studio:install": "cd studio && npm install"
+    "studio:install": "cd studio && npm install",
+    "ingest:videos": "cd studio && npx tsx migration/ingest-videos.ts --all",
+    "ingest:videos:dry": "cd studio && npx tsx migration/ingest-videos.ts --all --dry-run"
   },
   "dependencies": {
     "@ai-sdk/mcp": "^2.0.49",
@@ -25,12 +27,14 @@
     "next": "16.3.5",
     "next-sanity": "^13.3.4",
     "posthog-js": "^1.430.3",
+    "posthog-node": "^5.52.2",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "react-markdown": "^10.1.0",
     "sanity": "^5.31.2",
     "styled-components": "^6.5.3",
     "tailwind-merge": "^3.7.0",
+    "youtube-transcript": "^1.3.1",
     "zod": "^4.6.5"
   },
   "devDependencies": {

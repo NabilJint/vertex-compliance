@@ -7,6 +7,7 @@ import { WhatYouLearn } from "@/components/training/what-you-learn"
 import { Curriculum, type CurriculumModule } from "@/components/training/curriculum"
 import { Instructor } from "@/components/training/instructor"
 import { RelatedTraining } from "@/components/training/related-training"
+import { PageTracker } from "@/components/analytics/page-tracker"
 import { getTrainingProgramBySlug, getRelatedTrainingPrograms, getProgressByUser } from "@/lib/sanity"
 import type { LessonStatus, LessonSummary, UserProgress } from "@/lib/types"
 
@@ -73,6 +74,14 @@ export default async function TrainingProgramPage({ params }: PageProps) {
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
+      <PageTracker
+        event="training_program_viewed"
+        properties={{
+          program_id: program._id,
+          program_slug: program.slug.current,
+          category: program.category.slug?.current ?? "unknown",
+        }}
+      />
       <main className="flex-1">
         <TrainingHero
           program={program}

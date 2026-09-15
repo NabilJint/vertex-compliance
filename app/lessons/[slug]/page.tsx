@@ -82,6 +82,7 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
                 duration={lesson.duration}
                 moduleLessonLabel={moduleLessonLabel}
                 positionInSeconds={resumeSeconds}
+                lessonId={lesson._id}
               />
 
               <div className="mt-2 h-1 w-full overflow-hidden rounded-full" style={{ backgroundColor: "#E5E7EB" }}>
@@ -100,21 +101,22 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
               )}
 
               <div className="mt-6">
-                <LessonPageClient
-                  lessonId={lesson._id}
-                  lessonTitle={lesson.title}
-                  moduleNumber={moduleNumber}
-                  lessonNumber={lessonNumber}
-                  duration={lesson.duration}
-                  employeeCount={lesson.employeeCount}
-                  requiredBy={program.requiredBy}
-                  isCompleted={isCompleted}
-                  keyPoints={lesson.keyPoints}
-                  notes={lesson.notes}
-                  proTip={lesson.proTip}
-                  resources={lesson.resources}
-                  chunks={videoDoc?.chunks}
-                />
+              <LessonPageClient
+                lessonId={lesson._id}
+                lessonTitle={lesson.title}
+                moduleNumber={moduleNumber}
+                lessonNumber={lessonNumber}
+                duration={lesson.duration}
+                employeeCount={lesson.employeeCount}
+                requiredBy={program.requiredBy}
+                isCompleted={isCompleted}
+                resumeSeconds={resumeSeconds}
+                keyPoints={lesson.keyPoints}
+                notes={lesson.notes}
+                proTip={lesson.proTip}
+                resources={lesson.resources}
+                chunks={videoDoc?.chunks}
+              />
               </div>
 
               <LessonNavigation program={program} currentLessonId={lesson._id} />
